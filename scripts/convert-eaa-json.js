@@ -1,0 +1,76 @@
+const fs = require('fs');
+const path = require('path');
+
+console.log('Importing 928 questions from eaa-questions.json...');
+
+try {
+  // Read the new JSON format
+  const jsonPath = path.join(__dirname, '../src/data/eaa-questions.json');
+  const jsonData = fs.readFileSync(jsonPath, 'utf-8');
+  const data = JSON.parse(jsonData);
+  
+  console.log(`Found ${data.totalQuestions} questions`);
+  
+  // Helper function to escape strings for TypeScript
+  const escapeString = (str) => {
+    if (!str) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t');
+  };
+  
+  // Build TypeScript content
+  let tsContent = `export interface Question {
+  id: number;
+  question: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  optionE?: string;
+  correctAnswer: string;
+  explanation: string;
+}
+
+export const questions: Question[] = [\n`;
+  
+  data.questions.forEach((q, index) => {
+    tsContent += `  {\n`;
+    tsContent += `    id: ${q.id},\n`;
+    tsContent += `    question: "${escapeString(q.question)}",\n`;
+    tsContent += `    optionA: "${escapeString(q.options.A)}",\n`;
+    tsContent += `    optionB: "${escapeString(q.options.B)}",\n`;
+    tsContent += `    optionC: "${escapeString(q.options.C)}",\n`;
+    tsContent += `    optionD: "${escapeString(q.options.D)}",\n`;
+    
+    if (q.options.E) {
+      tsContent += `    optionE: "${escapeString(q.options.E)}",\n`;
+    }
+    
+    tsContent += `    correctAnswer: "${q.correctAnswer}",\n`;
+    tsContent += `    explanation: "${escapeString(q.explanation)}"\n`;
+    tsContent += index < data.questions.length - 1 ? `  },\n` : `  }\n`;
+  });
+  
+  tsContent += `];\n\n`;
+  tsContent += `export const getRandomQuestions = (count: number = 20): Question[] => {\n`;
+  tsContent += `  const shuffled = [...questions].sort(() => 0.5 - Math.random());\n`;
+  tsContent += `  return shuffled.slice(0, Math.min(count, questions.length));\n`;
+  tsContent += `};\n`;
+  
+  // Write TypeScript file
+  const outputPath = path.join(__dirname, '../src/data/questions.ts');
+  fs.writeFileSync(outputPath, tsContent, 'utf-8');
+  
+  console.log(`\n✅ Success!`);
+  console.log(`📊 Imported ${data.questions.length} questions to questions.ts`);
+  console.log(`📝 Output file: ${outputPath}`);
+  
+} catch (error) {
+  console.error('❌ Error:', error.message);
+  console.error(error.stack);
+  process.exit(1);
+}
