@@ -59,7 +59,7 @@ export const ExamWelcome = ({ onStart }: ExamWelcomeProps) => {
           </div>
 
           <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 sm:p-5">
-            <p className="text-base sm:text-lg text-accent-foreground">
+            <p className="text-base sm:text-lg text-foreground">
               <strong className="text-lg sm:text-xl">合格標準：</strong> 答對60%或以上（12題或以上）
             </p>
           </div>
