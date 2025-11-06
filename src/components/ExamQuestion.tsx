@@ -15,6 +15,8 @@ interface ExamQuestionProps {
   onPrevious: () => void;
   onNext: () => void;
   onReview: () => void;
+  onSubmit: () => void;
+  onHome: () => void;
   canGoPrevious: boolean;
   canGoNext: boolean;
 }
@@ -28,6 +30,8 @@ export const ExamQuestion = ({
   onPrevious,
   onNext,
   onReview,
+  onSubmit,
+  onHome,
   canGoPrevious,
   canGoNext,
 }: ExamQuestionProps) => {
@@ -45,44 +49,33 @@ export const ExamQuestion = ({
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 pb-32">
       {/* Progress Section */}
-      <Card className="p-4 sm:p-5">
-        <div className="space-y-3">
-          <div className="flex justify-between items-center text-base sm:text-lg">
+      <Card className="p-3 sm:p-4">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-sm sm:text-base">
             <span className="font-semibold">題目進度</span>
             <span className="text-muted-foreground font-medium">
               第 {currentIndex + 1} / {totalQuestions} 題
             </span>
           </div>
-          <Progress value={progress} className="h-3 sm:h-4" />
+          <Progress value={progress} className="h-2 sm:h-3" />
         </div>
       </Card>
 
       {/* Question Card */}
-      <Card className="p-5 sm:p-8">
-        <div className="space-y-5 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold leading-relaxed flex-1">
-              {currentIndex + 1}. {question.question}
-            </h2>
-            <Button
-              variant="outline"
-              size="default"
-              onClick={onReview}
-              className="flex-shrink-0 w-full sm:w-auto text-base sm:text-sm"
-            >
-              <List className="w-4 h-4 mr-2" />
-              檢閱答案
-            </Button>
-          </div>
+      <Card className="p-4 sm:p-6">
+        <div className="space-y-4">
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold leading-relaxed">
+            {currentIndex + 1}. {question.question}
+          </h2>
 
           <RadioGroup value={selectedAnswer} onValueChange={onAnswerSelect}>
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-2">
               {options.map((option) => (
                 <div
                   key={option.value}
-                  className={`flex items-start space-x-3 sm:space-x-4 p-4 sm:p-5 rounded-lg border-2 transition-all cursor-pointer hover:bg-muted/50 active:scale-[0.98] ${
+                  className={`flex items-start space-x-2 sm:space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer hover:bg-muted/50 active:scale-[0.98] ${
                     selectedAnswer === option.value
                       ? "border-primary bg-primary/5 shadow-md"
                       : "border-border"
@@ -92,13 +85,13 @@ export const ExamQuestion = ({
                   <RadioGroupItem
                     value={option.value}
                     id={`option-${option.value}`}
-                    className="mt-1 w-5 h-5 sm:w-4 sm:h-4"
+                    className="mt-0.5 w-4 h-4"
                   />
                   <Label
                     htmlFor={`option-${option.value}`}
-                    className="flex-1 cursor-pointer text-base sm:text-lg leading-relaxed"
+                    className="flex-1 cursor-pointer text-sm sm:text-base leading-relaxed"
                   >
-                    <span className="font-bold mr-2 text-primary">{option.value}.</span>
+                    <span className="font-bold mr-1.5 text-primary">{option.value}.</span>
                     {option.label}
                   </Label>
                 </div>
@@ -108,27 +101,61 @@ export const ExamQuestion = ({
         </div>
       </Card>
 
-      {/* Navigation */}
-      <div className="flex justify-between gap-3 sm:gap-4">
+      {/* Review and Home Buttons */}
+      <div className="space-y-2">
         <Button
           variant="outline"
-          size="lg"
-          onClick={onPrevious}
-          disabled={!canGoPrevious}
-          className="flex-1 sm:flex-none text-base sm:text-lg py-6"
+          size="default"
+          onClick={onReview}
+          className="w-full text-sm sm:text-base"
         >
-          <ChevronLeft className="w-5 h-5 mr-2" />
-          上一題
+          <List className="w-4 h-4 mr-2" />
+          檢閱答案
         </Button>
         <Button
-          size="lg"
-          onClick={onNext}
-          disabled={!canGoNext}
-          className="flex-1 sm:flex-none text-base sm:text-lg py-6"
+          variant="outline"
+          size="default"
+          onClick={onHome}
+          className="w-full text-sm sm:text-base"
         >
-          {currentIndex === totalQuestions - 1 ? "完成" : "下一題"}
-          <ChevronRight className="w-5 h-5 ml-2" />
+          返回主頁
         </Button>
+      </div>
+
+      {/* Fixed Navigation at Bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg z-50">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onPrevious}
+              disabled={!canGoPrevious}
+              className="flex-1 h-12 text-sm sm:text-base"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              上一題
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onSubmit}
+              className="flex-1 h-12 text-sm sm:text-base bg-destructive hover:bg-destructive/90"
+            >
+              提交考試
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onNext}
+              disabled={!canGoNext}
+              className="flex-1 h-12 text-sm sm:text-base"
+            >
+              下一題
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

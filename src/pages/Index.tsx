@@ -197,6 +197,8 @@ const Index = () => {
               onPrevious={handlePrevious}
               onNext={handleNext}
               onReview={() => setShowReview(true)}
+              onSubmit={() => setShowSubmitDialog(true)}
+              onHome={handleExit}
               canGoPrevious={currentQuestionIndex > 0}
               canGoNext={true}
             />
