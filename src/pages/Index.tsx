@@ -5,6 +5,7 @@ import { ExamQuestion } from "@/components/ExamQuestion";
 import { ExamTimer } from "@/components/ExamTimer";
 import { ExamReview } from "@/components/ExamReview";
 import { ExamResults } from "@/components/ExamResults";
+import { TopicSelection } from "@/components/TopicSelection";
 import { Question } from "@/types/question";
 import { toast } from "sonner";
 import {
@@ -18,7 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-type ExamState = "welcome" | "exam" | "results";
+type ExamState = "welcome" | "topicSelection" | "exam" | "results";
+type ExamMode = "mock" | "practice";
 
 const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
 
@@ -35,6 +37,8 @@ const Index = () => {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [hasShownFiveMinuteWarning, setHasShownFiveMinuteWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [examMode, setExamMode] = useState<ExamMode>("mock");
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
 
   // Check if disclaimer has been accepted
   useEffect(() => {
@@ -61,7 +65,8 @@ const Index = () => {
           optionD: q.options.D,
           optionE: q.options.E,
           correctAnswer: q.correctAnswer,
-          explanation: q.explanation
+          explanation: q.explanation,
+          category: q.category
         }));
         
         setAllQuestions(convertedQuestions);
@@ -101,6 +106,7 @@ const Index = () => {
   }, [examState, startTime, hasShownFiveMinuteWarning]);
 
   const handleStartExam = () => {
+    setExamMode("mock");
     const randomQuestions = getRandomQuestions(30);
     setQuestions(randomQuestions);
     setCurrentQuestionIndex(0);
@@ -111,6 +117,35 @@ const Index = () => {
     setHasShownFiveMinuteWarning(false);
     toast.success("考試已開始", {
       description: "祝你好運！",
+    });
+  };
+
+  const handleStartPractice = () => {
+    setExamState("topicSelection");
+  };
+
+  const handleSelectTopic = (topicNumber: string) => {
+    setExamMode("practice");
+    setSelectedTopic(topicNumber);
+    
+    // Filter questions by topic
+    const topicQuestions = allQuestions.filter(q => 
+      q.category && q.category.startsWith(`${topicNumber}.`)
+    );
+    
+    if (topicQuestions.length === 0) {
+      toast.error("此主題暫無題目");
+      return;
+    }
+    
+    setQuestions(topicQuestions);
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setStartTime(Date.now());
+    setEndTime(0);
+    setExamState("exam");
+    toast.success(`開始練習：主題 ${topicNumber}`, {
+      description: `共有 ${topicQuestions.length} 題`,
     });
   };
 
@@ -150,7 +185,12 @@ const Index = () => {
   };
 
   const handleRetake = () => {
-    setExamState("welcome");
+    if (examMode === "practice") {
+      // Retake the same topic
+      handleSelectTopic(selectedTopic);
+    } else {
+      setExamState("welcome");
+    }
   };
 
   const handleExit = () => {
@@ -173,19 +213,33 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {examState === "welcome" && <ExamWelcome onStart={handleStartExam} />}
+      {examState === "welcome" && (
+        <ExamWelcome 
+          onStart={handleStartExam} 
+          onStartPractice={handleStartPractice}
+        />
+      )}
+
+      {examState === "topicSelection" && (
+        <TopicSelection 
+          onSelectTopic={handleSelectTopic}
+          onBack={handleExit}
+        />
+      )}
 
       {examState === "exam" && (
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 py-4 sm:py-6 lg:py-8 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-            {/* Timer Header */}
-            <div className="flex justify-center">
-              <ExamTimer
-                startTime={startTime}
-                duration={EXAM_DURATION}
-                onTimeUp={handleTimeUp}
-              />
-            </div>
+            {/* Timer Header - only for mock exam */}
+            {examMode === "mock" && (
+              <div className="flex justify-center">
+                <ExamTimer
+                  startTime={startTime}
+                  duration={EXAM_DURATION}
+                  onTimeUp={handleTimeUp}
+                />
+              </div>
+            )}
 
             {/* Question */}
             <ExamQuestion
@@ -213,6 +267,7 @@ const Index = () => {
           timeTaken={timeTaken}
           onRetake={handleRetake}
           onExit={handleExit}
+          isPracticeMode={examMode === "practice"}
         />
       )}
 

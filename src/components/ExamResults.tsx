@@ -11,6 +11,7 @@ interface ExamResultsProps {
   timeTaken: number; // in seconds
   onRetake: () => void;
   onExit: () => void;
+  isPracticeMode?: boolean;
 }
 
 export const ExamResults = ({
@@ -19,6 +20,7 @@ export const ExamResults = ({
   timeTaken,
   onRetake,
   onExit,
+  isPracticeMode = false,
 }: ExamResultsProps) => {
   const correctCount = questions.filter(
     (q, i) => answers[i] === q.correctAnswer
@@ -180,7 +182,7 @@ export const ExamResults = ({
           <div className="space-y-4 sm:space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Button size="lg" onClick={onRetake} className="text-base sm:text-lg py-6">
-                重新考試
+                {isPracticeMode ? "重做此主題" : "重新考試"}
               </Button>
               <Button size="lg" variant="outline" onClick={onExit} className="text-base sm:text-lg py-6">
                 返回主頁

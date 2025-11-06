@@ -8,4 +8,5 @@ export interface Question {
   optionE?: string;
   correctAnswer: string;
   explanation: string;
+  category?: string;
 }

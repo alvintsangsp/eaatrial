@@ -14,9 +14,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ExamWelcomeProps {
   onStart: () => void;
+  onStartPractice: () => void;
 }
 
-export const ExamWelcome = ({ onStart }: ExamWelcomeProps) => {
+export const ExamWelcome = ({ onStart, onStartPractice }: ExamWelcomeProps) => {
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
 
   return (
@@ -190,13 +191,23 @@ export const ExamWelcome = ({ onStart }: ExamWelcomeProps) => {
             </p>
           </div>
 
-          <Button 
-            onClick={onStart}
-            size="lg"
-            className="w-full text-lg sm:text-xl py-6 sm:py-7"
-          >
-            開始考試
-          </Button>
+          <div className="space-y-3">
+            <Button 
+              onClick={onStart}
+              size="lg"
+              className="w-full text-lg sm:text-xl py-6 sm:py-7"
+            >
+              模擬考試
+            </Button>
+            <Button 
+              onClick={onStartPractice}
+              size="lg"
+              variant="outline"
+              className="w-full text-lg sm:text-xl py-6 sm:py-7 bg-yellow-50 hover:bg-yellow-100 border-yellow-200"
+            >
+              練習模式
+            </Button>
+          </div>
         </div>
       </Card>
     </div>
