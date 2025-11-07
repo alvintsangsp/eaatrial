@@ -52,8 +52,32 @@ const Index = () => {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const response = await fetch('/data/eaa-questions.json');
-        const data = await response.json();
+        // Try multiple paths for data loading to handle different deployment scenarios
+        const pathsToTry = [
+          './data/eaa-questions.json',
+          '/data/eaa-questions.json',
+          './eaatrial/data/eaa-questions.json'
+        ];
+        
+        let data;
+        let response;
+        
+        for (const path of pathsToTry) {
+          try {
+            response = await fetch(path);
+            if (response.ok) {
+              data = await response.json();
+              console.log(`Successfully loaded data from ${path}`);
+              break;
+            }
+          } catch (error) {
+            console.log(`Failed to load data from ${path}:`, error);
+          }
+        }
+        
+        if (!data) {
+          throw new Error('Failed to load questions data from any path');
+        }
         
         // Convert from JSON format to app format
         const convertedQuestions: Question[] = data.questions.map((q: any) => ({
@@ -74,7 +98,7 @@ const Index = () => {
         toast.success(`已載入 ${convertedQuestions.length} 題問題`);
       } catch (error) {
         console.error('Failed to load questions:', error);
-        toast.error('載入問題失敗');
+        toast.error('載入問題失敗: ' + (error as Error).message);
         setIsLoading(false);
       }
     };
