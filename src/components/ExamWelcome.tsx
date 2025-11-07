@@ -193,12 +193,6 @@ export const ExamWelcome = ({ onStart, onStartPractice }: ExamWelcomeProps) => {
             </div>
           </div>
 
-          <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 sm:p-5">
-            <p className="text-base sm:text-lg text-foreground">
-              <strong className="text-lg sm:text-xl">合格標準：</strong> 答對60%或以上（18題或以上）
-            </p>
-          </div>
-
           <div className="space-y-3">
             <Button 
               onClick={onStart}
@@ -215,6 +209,11 @@ export const ExamWelcome = ({ onStart, onStartPractice }: ExamWelcomeProps) => {
             >
               練習模式
             </Button>
+            <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 sm:p-5">
+              <p className="text-base sm:text-lg text-foreground">
+                <strong className="text-lg sm:text-xl">合格標準：</strong> 答對60%或以上（18題或以上）
+              </p>
+            </div>
           </div>
         </div>
       </Card>
