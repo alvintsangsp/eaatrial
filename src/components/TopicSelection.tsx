@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TopicSelectionProps {
   onSelectTopic: (topicNumber: string) => void;
@@ -8,17 +9,19 @@ interface TopicSelectionProps {
 }
 
 const topics = [
-  { number: "1", name: "香港地產代理業簡介" },
-  { number: "2", name: "適用於地產代理業務的法律" },
-  { number: "3", name: "倫理守則" },
-  { number: "4", name: "客戶資金處理規則" },
-  { number: "5", name: "利益衝突及相關交易" },
-  { number: "6", name: "廣告限制" },
-  { number: "7", name: "文件及記錄保存" },
-  { number: "8", name: "其他規例及要求" },
+  { number: "1", nameKey: "topic8" },
+  { number: "2", nameKey: "topic9" },
+  { number: "3", nameKey: "topic10" },
+  { number: "4", nameKey: "topic11" },
+  { number: "5", nameKey: "topic12" },
+  { number: "6", nameKey: "topic13" },
+  { number: "7", nameKey: "topic14" },
+  { number: "8", nameKey: "topic15" },
 ];
 
 export const TopicSelection = ({ onSelectTopic, onBack }: TopicSelectionProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 py-6 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -28,7 +31,7 @@ export const TopicSelection = ({ onSelectTopic, onBack }: TopicSelectionProps) =
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          返回主頁
+          {t('backToHome')}
         </Button>
 
         <Card className="p-6">
@@ -36,8 +39,8 @@ export const TopicSelection = ({ onSelectTopic, onBack }: TopicSelectionProps) =
             <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
               <BookOpen className="w-10 h-10 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold mb-2">練習模式</h1>
-            <p className="text-lg text-muted-foreground">選擇一個主題開始練習</p>
+            <h1 className="text-3xl font-bold mb-2">{t('practiceMode')}</h1>
+            <p className="text-lg text-muted-foreground">{t('selectTopic')}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -52,7 +55,7 @@ export const TopicSelection = ({ onSelectTopic, onBack }: TopicSelectionProps) =
                     <span className="text-primary font-bold">{topic.number}</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm leading-tight">{topic.name}</h3>
+                    <h3 className="font-semibold text-sm leading-tight">{t(topic.nameKey)}</h3>
                   </div>
                 </div>
               </Card>

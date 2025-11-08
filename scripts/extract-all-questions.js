@@ -10,7 +10,7 @@ try {
   console.log('Reading from alternative path...');
   // Try reading the Excel file directly
   const XLSX = require('xlsx');
-  const excelPath = path.join(__dirname, '../src/assets/EAA_Questions_Set_v2.xlsx');
+  const excelPath = path.join(__dirname, '../src/assets/香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)_Questions_Set_v2.xlsx');
   const workbook = XLSX.readFile(excelPath);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];

@@ -4,8 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Disclaimer = () => {
+  const { t } = useLanguage();
   const [agreed, setAgreed] = useState(false);
   const navigate = useNavigate();
 
@@ -22,14 +24,14 @@ export const Disclaimer = () => {
         {/* Main Disclaimer Content */}
         <Card className="p-6 sm:p-8">
           <div className="space-y-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center">免責聲明及使用條款</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center">{t('disclaimer')}</h2>
 
             <div className="space-y-5 text-base sm:text-lg">
               <div className="space-y-3">
                 <h3 className="text-xl font-bold">1. 應用程式用途</h3>
-                <p>本應用程式<strong>僅供個人教育及訓練用途</strong>，幫助您準備香港地產代理人員資格考試（EAQE）。</p>
+                <p>本應用程式僅供個人教育及訓練用途，幫助您準備香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)。</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>不是由香港地產代理監管局（EAA）官方開發或認可</li>
+                  <li>不是由香港地產代理監管局（香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)）官方開發或認可</li>
                   <li>不是官方考試資源</li>
                   <li>僅為輔助學習工具</li>
                 </ul>
@@ -42,7 +44,7 @@ export const Disclaimer = () => {
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>您必須主動查證所有資訊，特別是最新的法律條款、現行的考試內容、官方的規定和指引</li>
                   <li>您不能完全依賴本應用程式</li>
-                  <li>應主要參考香港地產代理監管局（EAA）的官方資源</li>
+                  <li>應主要參考香港地產代理監管局（香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)）的官方資源</li>
                   <li>應在考試前確認資訊是否仍然適用</li>
                 </ul>
               </div>
@@ -78,7 +80,7 @@ export const Disclaimer = () => {
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>為自己的學習進度負責</li>
                   <li>主動驗證所有重要資訊</li>
-                  <li>參考官方的 EAA 資源</li>
+                  <li>參考官方的 香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE) 資源</li>
                   <li>了解本應用程式的局限性</li>
                   <li>不能將考試失敗的責任歸咎於本應用程式</li>
                 </ul>
@@ -102,7 +104,7 @@ export const Disclaimer = () => {
                 </h3>
                 <p>如您發現錯誤或有疑問，請聯繫我們：</p>
                 <a 
-                  href="mailto:cs@bitebite.app?subject=EAA%20Mock%20Exam%20-%20Error%20Report"
+                  href="mailto:cs@bitebite.app?subject=香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)%20Mock%20Exam%20-%20Error%20Report"
                   className="inline-flex items-center gap-2 text-primary hover:underline font-semibold"
                 >
                   <Mail className="w-5 h-5" />

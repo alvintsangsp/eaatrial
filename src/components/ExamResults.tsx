@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CheckCircle2, XCircle, Trophy, Clock, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ExamResultsProps {
   questions: Question[];
@@ -22,6 +23,7 @@ export const ExamResults = ({
   onExit,
   isPracticeMode = false,
 }: ExamResultsProps) => {
+  const { t } = useLanguage();
   const correctCount = questions.filter(
     (q, i) => answers[i] === q.correctAnswer
   ).length;
@@ -34,10 +36,10 @@ export const ExamResults = ({
 
   const handleReportError = () => {
     const subject = encodeURIComponent(
-      `[EAA Mock Exam] Question Feedback - ${new Date().toLocaleDateString()}`
+      `[香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE) Mock Exam] Question Feedback - ${new Date().toLocaleDateString()}`
     );
     const body = encodeURIComponent(
-      "題目編號：\n問題描述：\n"
+      t('questionFeedback')
     );
     window.location.href = `mailto:cs@bitebite.app?subject=${subject}&body=${body}`;
   };
@@ -64,30 +66,30 @@ export const ExamResults = ({
 
             <div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3">
-                {passed ? "✓ 合格" : "✗ 不合格"}
+                {passed ? t('passed') : t('failed')}
               </h1>
               <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground font-medium">
-                你的得分：{correctCount}/{totalQuestions} ({percentage}%)
+                {t('yourScore')}{correctCount}/{totalQuestions} ({percentage}%)
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4">
               <div className="space-y-2 p-3 sm:p-4 bg-background/50 rounded-lg">
-                <p className="text-sm sm:text-base text-muted-foreground">總題數</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{t('totalQuestions')}</p>
                 <p className="text-2xl sm:text-3xl font-bold">{totalQuestions}</p>
               </div>
               <div className="space-y-2 p-3 sm:p-4 bg-background/50 rounded-lg">
-                <p className="text-sm sm:text-base text-muted-foreground">答對</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{t('correct')}</p>
                 <p className="text-2xl sm:text-3xl font-bold text-success">{correctCount}</p>
               </div>
               <div className="space-y-2 p-3 sm:p-4 bg-background/50 rounded-lg">
-                <p className="text-sm sm:text-base text-muted-foreground">答錯</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{t('wrong')}</p>
                 <p className="text-2xl sm:text-3xl font-bold text-destructive">
                   {totalQuestions - correctCount}
                 </p>
               </div>
               <div className="space-y-2 p-3 sm:p-4 bg-background/50 rounded-lg">
-                <p className="text-sm sm:text-base text-muted-foreground">用時</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{t('timeTaken')}</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {minutes}:{String(seconds).padStart(2, "0")}
                 </p>
@@ -98,7 +100,7 @@ export const ExamResults = ({
 
         {/* Questions Review */}
         <Card className="p-5 sm:p-6">
-          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">逐題檢閱</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{t('questionReview')}</h2>
           <Accordion type="multiple" className="w-full">
             {questions.map((question, index) => {
               const userAnswer = answers[index];
@@ -156,15 +158,15 @@ export const ExamResults = ({
                       </div>
 
                       <div className="bg-muted/50 p-4 sm:p-5 rounded-lg">
-                        <h4 className="font-bold mb-3 text-base sm:text-lg">解釋：</h4>
+                        <h4 className="font-bold mb-3 text-base sm:text-lg">{t('explanation')}</h4>
                         <p className="text-base sm:text-lg leading-relaxed">{question.explanation}</p>
                       </div>
 
                       {!isCorrect && (
                         <div className="bg-destructive/10 border border-destructive/20 p-4 sm:p-5 rounded-lg">
                           <p className="text-base sm:text-lg leading-relaxed">
-                            <strong>你的答案：</strong> {userAnswer || "未作答"}{" "}
-                            <strong className="ml-4">正確答案：</strong>{" "}
+                            <strong>{t('yourAnswer')}</strong> {userAnswer || t('notAnswered')}{" "}
+                            <strong className="ml-4">{t('correctAnswer')}</strong>{" "}
                             {question.correctAnswer}
                           </p>
                         </div>
@@ -182,22 +184,22 @@ export const ExamResults = ({
           <div className="space-y-4 sm:space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Button size="lg" onClick={onRetake} className="text-base sm:text-lg py-6">
-                {isPracticeMode ? "重做此主題" : "重新考試"}
+                {isPracticeMode ? t('retakeSameTopic') : t('retakeExam')}
               </Button>
               <Button size="lg" variant="outline" onClick={onExit} className="text-base sm:text-lg py-6">
-                返回主頁
+                {t('backToHome')}
               </Button>
             </div>
 
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 bg-muted/50 rounded-lg">
               <Mail className="w-6 h-6 sm:w-5 sm:h-5 text-primary mt-0.5" />
               <div className="flex-1">
-                <p className="font-semibold mb-2 text-base sm:text-lg">發現題目有錯誤或想提供意見？</p>
+                <p className="font-semibold mb-2 text-base sm:text-lg">{t('errorReporting')}</p>
                 <p className="text-base sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                  請聯絡客戶服務回報問題
+                  {t('reportProblem')}
                 </p>
                 <Button variant="outline" size="default" onClick={handleReportError} className="text-base sm:text-sm">
-                  回報問題
+                  {t('reportProblem')}
                 </Button>
               </div>
             </div>

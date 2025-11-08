@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useRef } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ExamQuestionProps {
   question: Question;
@@ -36,6 +37,7 @@ export const ExamQuestion = ({
   canGoPrevious,
   canGoNext,
 }: ExamQuestionProps) => {
+  const { t } = useLanguage();
   const questionTopRef = useRef<HTMLDivElement>(null);
 
   const options = [
@@ -65,9 +67,9 @@ export const ExamQuestion = ({
       <Card className="p-3 sm:p-4">
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm sm:text-base">
-            <span className="font-semibold">題目進度</span>
+            <span className="font-semibold">{t('questionProgress')}</span>
             <span className="text-muted-foreground font-medium">
-              第 {currentIndex + 1} / {totalQuestions} 題
+              {t('question')} {currentIndex + 1} / {totalQuestions} {t('questionUnit')}
             </span>
           </div>
           <Progress value={progress} className="h-2 sm:h-3" />
@@ -79,7 +81,7 @@ export const ExamQuestion = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <p className="text-sm sm:text-base text-muted-foreground font-medium">
-              題目編號：{question.id}
+              {t('questionNumber')}{question.id}
             </p>
             <h2 className="text-base sm:text-lg lg:text-xl font-bold leading-relaxed">
               {question.question}
@@ -126,7 +128,7 @@ export const ExamQuestion = ({
           className="w-full text-sm sm:text-base"
         >
           <List className="w-4 h-4 mr-2" />
-          檢閱答案
+          {t('reviewAnswers')}
         </Button>
         <Button
           variant="outline"
@@ -134,7 +136,7 @@ export const ExamQuestion = ({
           onClick={onHome}
           className="w-full text-sm sm:text-base"
         >
-          返回主頁
+          {t('backToHome')}
         </Button>
       </div>
 
@@ -150,7 +152,7 @@ export const ExamQuestion = ({
               className="flex-1 max-w-[30%] h-12 text-sm sm:text-base"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              上一題
+              {t('previousQuestion')}
             </Button>
             <Button
               variant="default"
@@ -158,7 +160,7 @@ export const ExamQuestion = ({
               onClick={onSubmit}
               className="flex-[0.7] max-w-[21%] h-12 text-sm sm:text-base bg-destructive hover:bg-destructive/90"
             >
-              提交考試
+              {t('submitExam')}
             </Button>
             <Button
               variant="default"
@@ -167,7 +169,7 @@ export const ExamQuestion = ({
               disabled={!canGoNext}
               className="flex-1 max-w-[30%] h-12 text-sm sm:text-base"
             >
-              下一題
+              {t('nextQuestion')}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>

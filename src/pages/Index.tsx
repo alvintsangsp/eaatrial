@@ -18,6 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { sify } from 'chinese-conv';
 
 type ExamState = "welcome" | "topicSelection" | "exam" | "results";
 type ExamMode = "mock" | "practice";
@@ -25,10 +27,12 @@ type ExamMode = "mock" | "practice";
 const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
 
 const Index = () => {
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [examState, setExamState] = useState<ExamState>("welcome");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]); // Store original Traditional Chinese questions
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [startTime, setStartTime] = useState(0);
@@ -47,6 +51,44 @@ const Index = () => {
       navigate("/disclaimer");
     }
   }, [navigate]);
+
+  // Convert question to appropriate language
+  const convertQuestionToSimplified = (question: Question): Question => {
+    // Convert to Simplified Chinese
+    return {
+      ...question,
+      question: sify(question.question),
+      optionA: sify(question.optionA),
+      optionB: sify(question.optionB),
+      optionC: sify(question.optionC),
+      optionD: sify(question.optionD),
+      optionE: question.optionE ? sify(question.optionE) : undefined,
+      explanation: sify(question.explanation)
+    };
+  };
+
+  // Convert questions array to Simplified Chinese
+  const convertQuestionsToSimplified = (questions: Question[]): Question[] => {
+    return questions.map(convertQuestionToSimplified);
+  };
+
+  // Get questions in the current language
+  const getQuestionsInCurrentLanguage = (questions: Question[]): Question[] => {
+    if (language === 'zh-CN') {
+      return convertQuestionsToSimplified(questions);
+    }
+    // Return original for Traditional Chinese
+    return questions;
+  };
+
+  // Update the displayed questions when language changes
+  useEffect(() => {
+    if (questions.length > 0) {
+      // Convert current questions to the current language
+      const convertedQuestions = getQuestionsInCurrentLanguage(questions);
+      setQuestions(convertedQuestions);
+    }
+  }, [language]);
 
   // Load questions from JSON file
   useEffect(() => {
@@ -93,21 +135,24 @@ const Index = () => {
           category: q.category
         }));
         
-        setAllQuestions(convertedQuestions);
+        // Store original questions and set all questions in current language
+        setOriginalQuestions(convertedQuestions);
+        setAllQuestions(getQuestionsInCurrentLanguage(convertedQuestions));
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to load questions:', error);
-        toast.error('載入問題失敗: ' + (error as Error).message);
+        toast.error(t('loadingQuestions') + ': ' + (error as Error).message);
         setIsLoading(false);
       }
     };
     
     loadQuestions();
-  }, []);
+  }, [t]);
 
   const getRandomQuestions = (count: number = 30): Question[] => {
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, Math.min(count, allQuestions.length));
+    const shuffled = [...originalQuestions].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, Math.min(count, originalQuestions.length));
+    return getQuestionsInCurrentLanguage(selected);
   };
 
   useEffect(() => {
@@ -117,8 +162,8 @@ const Index = () => {
         const remaining = EXAM_DURATION - elapsed;
 
         if (remaining === 300 && !hasShownFiveMinuteWarning) {
-          toast.warning("只剩下5分鐘！", {
-            description: "請檢查你的答案",
+          toast.warning(t('fiveMinutesLeft'), {
+            description: t('checkAnswers'),
           });
           setHasShownFiveMinuteWarning(true);
         }
@@ -126,7 +171,7 @@ const Index = () => {
 
       return () => clearInterval(checkInterval);
     }
-  }, [examState, startTime, hasShownFiveMinuteWarning]);
+  }, [examState, startTime, hasShownFiveMinuteWarning, t]);
 
   const handleStartExam = () => {
     setExamMode("mock");
@@ -138,8 +183,8 @@ const Index = () => {
     setEndTime(0);
     setExamState("exam");
     setHasShownFiveMinuteWarning(false);
-    toast.success("考試已開始", {
-      description: "祝你好運！",
+    toast.success(t('examStarted'), {
+      description: t('goodLuck'),
     });
   };
 
@@ -151,28 +196,29 @@ const Index = () => {
     setExamMode("practice");
     setSelectedTopic(topicNumber);
     
-    // Filter questions by topic
-    const topicQuestions = allQuestions.filter(q => 
+    // Filter questions by topic using original questions
+    const topicQuestions = originalQuestions.filter(q => 
       q.category && q.category.startsWith(`${topicNumber}.`)
     );
     
     if (topicQuestions.length === 0) {
-      toast.error("此主題暫無題目");
+      toast.error(t('noQuestionsInTopic'));
       return;
     }
     
     // Randomly select 20 questions (or all if less than 20)
     const shuffled = [...topicQuestions].sort(() => 0.5 - Math.random());
     const selectedQuestions = shuffled.slice(0, Math.min(20, topicQuestions.length));
+    const convertedQuestions = getQuestionsInCurrentLanguage(selectedQuestions);
     
-    setQuestions(selectedQuestions);
+    setQuestions(convertedQuestions);
     setCurrentQuestionIndex(0);
     setAnswers({});
     setStartTime(Date.now());
     setEndTime(0);
     setExamState("exam");
-    toast.success(`開始練習：主題 ${topicNumber}`, {
-      description: `共有 ${selectedQuestions.length} 題`,
+    toast.success(`${t('startPractice')} ${topicNumber}`, {
+      description: `${t('questionsCount')} ${selectedQuestions.length} ${t('questions')}`,
     });
   };
 
@@ -199,8 +245,8 @@ const Index = () => {
   };
 
   const handleTimeUp = () => {
-    toast.error("時間到！", {
-      description: "考試已自動提交",
+    toast.error(t('timeUp'), {
+      description: t('examAutoSubmitted'),
     });
     handleSubmitExam();
   };
@@ -232,7 +278,7 @@ const Index = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">載入問題中...</p>
+          <p className="text-muted-foreground">{t('loadingQuestions')}</p>
         </div>
       </div>
     );
@@ -312,23 +358,23 @@ const Index = () => {
       <AlertDialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>確認提交考試？</AlertDialogTitle>
+            <AlertDialogTitle>{t('submitExam')}</AlertDialogTitle>
             <AlertDialogDescription>
               {unansweredCount > 0 ? (
                 <span className="text-destructive font-medium">
-                  你還有 {unansweredCount} 題未回答。
+                  {t('questionsCount')} {unansweredCount} {t('questions')}
                 </span>
               ) : (
-                "你已完成所有題目。"
+                t('continueExam')
               )}
               <br />
-              提交後將無法修改答案。
+              {t('examAutoSubmitted')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>繼續答題</AlertDialogCancel>
+            <AlertDialogCancel>{t('continueExam')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmitExam}>
-              確認提交
+              {t('submitExam')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -7,7 +7,7 @@ This script automatically generates the `src/data/questions.ts` file from the Ex
 The script requires:
 - Node.js installed
 - The `xlsx` package (already added to package.json)
-- The Excel file located at: `src/assets/EAA_Questions_Set_v2.xlsx`
+- The Excel file located at: `src/assets/香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)_Questions_Set_v2.xlsx`
 
 ## Usage
 
@@ -27,7 +27,7 @@ bun run generate-questions
 
 ## What it does
 
-1. Reads the Excel file from `src/assets/EAA_Questions_Set_v2.xlsx`
+1. Reads the Excel file from `src/assets/香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)_Questions_Set_v2.xlsx`
 2. Extracts all 935 questions with their:
    - Question ID (1-935)
    - Question text
@@ -56,7 +56,7 @@ Extracted 935 questions from the Excel file.
 ## Troubleshooting
 
 If you encounter errors:
-1. Ensure the Excel file exists at `src/assets/EAA_Questions_Set_v2.xlsx`
+1. Ensure the Excel file exists at `src/assets/香港地產代理人員資格考試（EAQE）/ 營業員資格 (SQE)_Questions_Set_v2.xlsx`
 2. Check that you have write permissions for `src/data/`
 3. Verify Node.js is installed: `node --version`
 4. Install dependencies: `npm install` or `bun install`

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, Circle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ExamReviewProps {
   questions: Question[];
@@ -22,6 +23,7 @@ export const ExamReview = ({
   onJumpToQuestion,
   onSubmit,
 }: ExamReviewProps) => {
+  const { t } = useLanguage();
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = questions.length - answeredCount;
 
@@ -29,18 +31,18 @@ export const ExamReview = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[85vh] sm:max-h-[80vh] p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl">檢閱答案</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl">{t('reviewAnswers')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 sm:space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 sm:p-5 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 sm:gap-3">
               <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-success" />
-              <span className="text-base sm:text-lg font-medium">已回答：{answeredCount} 題</span>
+              <span className="text-base sm:text-lg font-medium">{t('answeredQuestions')}{answeredCount} {t('questionUnit')}</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-destructive" />
-              <span className="text-base sm:text-lg font-medium">未回答：{unansweredCount} 題</span>
+              <span className="text-base sm:text-lg font-medium">{t('unansweredQuestions')}{unansweredCount} {t('questionUnit')}</span>
             </div>
           </div>
 
@@ -69,13 +71,13 @@ export const ExamReview = ({
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold mb-2 text-base sm:text-lg">題目 {index + 1}</div>
+                      <div className="font-bold mb-2 text-base sm:text-lg">{t('question')} {index + 1}</div>
                       <div className="text-base sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                         {question.question}
                       </div>
                       {isAnswered && (
                         <div className="text-base sm:text-sm font-semibold mt-2 text-primary">
-                          已選擇：{answers[index]}
+                          {t('selectedAnswer')}{answers[index]}
                         </div>
                       )}
                     </div>
@@ -87,11 +89,11 @@ export const ExamReview = ({
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Button variant="outline" onClick={onClose} className="flex-1 text-base sm:text-sm py-6 sm:py-3">
-              繼續答題
+              {t('continueExam')}
             </Button>
             {onSubmit && (
               <Button onClick={onSubmit} className="flex-1 text-base sm:text-sm py-6 sm:py-3">
-                提交考試
+                {t('submitExam')}
               </Button>
             )}
           </div>
